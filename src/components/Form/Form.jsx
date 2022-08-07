@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
 import styles from './Form.module.css';
 
-export default function Form({ handleSubmitForm, contacts }) {
+const Form = ({ handleSubmit, contacts }) => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
   const handleChange = e => {
@@ -20,14 +20,14 @@ export default function Form({ handleSubmitForm, contacts }) {
         return;
     }
   };
-  const handleSubmit = e => {
+  const handleSubmitRen = e => {
     e.preventDefault();
     const id = nanoid();
     const check = contacts.find(
       el => el.name.toLowerCase() === name.toLowerCase()
     );
     if (!check) {
-      handleSubmitForm({ id, name, number });
+      handleSubmit({ id, name, number });
       setName('');
       setNumber('');
     } else {
@@ -35,7 +35,7 @@ export default function Form({ handleSubmitForm, contacts }) {
     }
   };
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
+    <form onSubmit={handleSubmitRen} className={styles.form}>
       <label className={styles.label}>
         Name
         <input
@@ -65,9 +65,67 @@ export default function Form({ handleSubmitForm, contacts }) {
       <button type="submit">add contact</button>
     </form>
   );
-}
-
+};
+export default Form;
 Form.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   contacts: PropTypes.array.isRequired,
 };
+
+// const App = () => {
+//   const [contacts, setContacts] = useState(
+//     () => JSON.parse(localStorage.getItem('contacts')) ?? []
+//   );
+//   const [filter, setFilter] = useState('');
+//   const firstStartRef = useRef(false);
+
+//   useEffect(() => {
+//     if (firstStartRef.current) {
+//       const data = JSON.stringify(contacts);
+//       localStorage.setItem('contacts', data);
+//     }
+//     firstStartRef.current = true;
+//   }, [contacts]);
+
+//   const handleSubmitForm = obj => {
+//     setContacts(prev => [...prev, obj]);
+//   };
+
+//   const handleChangeInput = e => {
+//     setFilter(e.target.value);
+//   };
+
+//   const handleDeleteContacts = id => {
+//     setContacts(contacts.filter(el => el.id !== id));
+//   };
+
+//   const filterList = useMemo(
+//     () =>
+//       contacts.filter(el =>
+//         el.name.toLowerCase().includes(filter.toLocaleLowerCase())
+//       ),
+//     [filter, contacts]
+//   );
+
+//   return (
+//     <div className={s.wrap}>
+//       <div className={s.phonebook}>
+//         <h1 className={s.title}>Phonebook</h1>
+//         <ContactForm contacts={contacts} handleSubmitForm={handleSubmitForm} />
+//         <Filter
+//           title="Find contacts by name"
+//           value={filter}
+//           handleChangeInput={handleChangeInput}
+//         />
+//       </div>
+
+//       <div className={s.contacts}>
+//         <h2 className={s.subTitle}>Contacts: {contacts.length}</h2>
+//         <ContactList
+//           contacts={filterList}
+//           handleDeleteContacts={handleDeleteContacts}
+//         />
+//       </div>
+//     </div>
+//   );
+// };

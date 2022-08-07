@@ -1,66 +1,57 @@
-import { Component } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+
 import Form from './Form/Form';
 import FormList from '../components/FormList/FormList';
 import Filter from './Filter/Filter';
 import styles from './App.module.css';
+import { useRef } from 'react';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+export const App = () => {
+  const [contacts, setContacts] = useState(
+    () => JSON.parse(localStorage.getItem('contacts')) ?? []
+  );
+  const [filter, setFilter] = useState('');
+  const firstStartRef = useRef(false);
 
-  componentDidUpdate(prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+  useEffect(() => {
+    if (firstStartRef.current) {
+      const data = JSON.stringify(contacts);
+      localStorage.setItem('contacts', data);
     }
-  }
-  componentDidMount() {
-    const contacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(contacts);
-    if (parsedContacts) {
-      this.setState({ contacts: parsedContacts });
-    }
-  }
+    firstStartRef.current = true;
+  }, [contacts]);
 
-  handleSubmit = obj => {
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts, { ...obj }],
-    }));
+  const handleSubmit = obj => {
+    setContacts(prev => [...prev, obj]);
   };
-  handleChange = e => {
-    const { name, value } = e.currentTarget;
-    this.setState({
-      [name]: value,
-    });
+  const handleChange = e => {
+    setFilter(e.target.value);
   };
-  handleDeleteContacts = id => {
-    this.setState({ contacts: this.state.contacts.filter(el => el.id !== id) });
+  const handleDeleteContacts = id => {
+    setContacts(contacts.filter(el => el.id !== id));
   };
-  render() {
-    return (
-      <div className={styles.box}>
-        <div className={styles.boxPhone}>
-          <h1>Phonebook</h1>
-          <Form
-            contacts={this.state.contacts}
-            handleSubmit={this.handleSubmit}
-          />
+  const filterList = useMemo(
+    () =>
+      contacts.filter(el =>
+        el.name.toLowerCase().includes(filter.toLocaleLowerCase())
+      ),
+    [filter, contacts]
+  );
+  return (
+    <div className={styles.box}>
+      <div className={styles.boxPhone}>
+        <h1>Phonebook</h1>
+        <Form contacts={contacts} handleSubmit={handleSubmit} />
 
-          <Filter
-            title="Find contacts by name"
-            handleChange={this.handleChange}
-          />
-        </div>
-        <div className={styles.contacts}>
-          <h2>Contacts</h2>
-          <FormList
-            filter={this.state.filter}
-            contacts={this.state.contacts}
-            handleDeleteContacts={this.handleDeleteContacts}
-          />
-        </div>
+        <Filter title="Find contacts by name" handleChange={handleChange} />
       </div>
-    );
-  }
-}
+      <div className={styles.contacts}>
+        <h2>Contacts</h2>
+        <FormList
+          contacts={filterList}
+          handleDeleteContacts={handleDeleteContacts}
+        />
+      </div>
+    </div>
+  );
+};
