@@ -43,7 +43,11 @@ export const App = () => {
         <h1>Phonebook</h1>
         <Form contacts={contacts} handleSubmit={handleSubmit} />
 
-        <Filter title="Find contacts by name" handleChange={handleChange} />
+        <Filter
+          value={filter}
+          title="Find contacts by name"
+          handleChange={handleChange}
+        />
       </div>
       <div className={styles.contacts}>
         <h2>Contacts</h2>

@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 
-const Filter = ({ title, handleChange }) => {
+const Filter = ({ value, title, handleChange }) => {
   return (
     <>
       <h2>{title}</h2>
       <input
         type="text"
+        value={value}
         placeholder="Enter name"
         name="filter"
         onChange={handleChange}
